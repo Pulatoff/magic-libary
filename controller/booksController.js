@@ -1,4 +1,6 @@
-function getAllBooks(req, res) {
+const bookModel = require('../model/booksModel');
+
+async function getAllBooks(req, res) {
   fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (er, data) => {
     res.status(200).json({
       status: 'success',
@@ -9,22 +11,14 @@ function getAllBooks(req, res) {
   });
 }
 
-function addBook(req, res) {
-  const data = req.body;
-  const id = data.at(-1).id + 1;
-  const comObj = Object.assign({ id: id }, data);
-  data.push(comObj);
-  fs.writeFileSync(
-    `${__dirname}/dev-data/data/data.json`,
-    JSON.stringify(data),
-    'utf-8'
-  );
-  res.status(200).json({
-    status: 'success',
+async function addBook(req, res) {
+  const data = await bookModel.create(req.body);
+  res.status(201).json({
+    status: data,
   });
 }
 
-function getOneBook(req, res) {
+async function getOneBook(req, res) {
   const id = +req.params.id;
 
   fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (err, data) => {
@@ -39,8 +33,8 @@ function getOneBook(req, res) {
   });
 }
 
-function updateBook(req, res) {}
+async function updateBook(req, res) {}
 
-function deleteBook(req, res) {}
+async function deleteBook(req, res) {}
 
 module.exports = { getAllBooks, addBook, getOneBook, updateBook, deleteBook };
