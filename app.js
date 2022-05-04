@@ -3,14 +3,13 @@ const morgan = require('morgan');
 const fs = require('fs');
 const cors = require('cors');
 const app = express();
+const booksRouter = require('./router/booksRouter');
+const usersRouter = require('./router/userRouter');
 
 // ===== Datas =======
 
 const users = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/users.json`, 'utf-8')
-);
-const books = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/books.json`, 'utf-8')
 );
 
 // ===== Middleware ======
@@ -26,81 +25,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(morgan('dev'));
+
+app.use('/api/v1/books', booksRouter);
+app.use('/api/v1/users', usersRouter);
+
+module.exports = app;
+
 // ====== Routes ======
 
-app.get('/api/v1/books', (req, res) => {
-  fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (er, data) => {
-    res.status(200).json({
-      status: 'success',
-      data: {
-        data,
-      },
-    });
-  });
-});
-
-app.get('/api/v1/books/:id', (req, res) => {
-  const id = +req.params.id;
-
-  fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (err, data) => {
-    const arr = JSON.parse(data);
-    const obj = arr.find((val) => val.id == id);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        obj,
-      },
-    });
-  });
-});
-
-app.post('/api/v1/users', (req, res) => {
-  const idBook = +req.params.id;
-  const data = req.body;
-  const id = users.at(-1).id + 1;
-  const comObj = Object.assign({ id: id }, data);
-  users.push(comObj);
-  fs.writeFileSync(
-    `${__dirname}/dev-data/data/users.json`,
-    JSON.stringify(users),
-    'utf-8'
-  );
-  res.status(201).json({
-    status: 'success',
-  });
-});
-
-app.get('/api/v1/users', (req, res) => {
-  fs.readFile(`${__dirname}/dev-data/data/users.json`, 'utf-8', (er, data) => {
-    let datas = JSON.parse(data);
-    res.status(200).json({
-      data: {
-        datas,
-      },
-    });
-  });
-});
-
-app.post('/api/v1/books', (req, res) => {
-  const data = req.body;
-  const id = data.at(-1).id + 1;
-  const comObj = Object.assign({ id: id }, data);
-  data.push(comObj);
-  fs.writeFileSync(
-    `${__dirname}/dev-data/data/data.json`,
-    JSON.stringify(data),
-    'utf-8'
-  );
-  res.status(200).json({
-    status: 'success',
-  });
-});
-// ===== Server ======
-
-const port = 8000;
-app.listen(port, '127.0.0.1');
-
-// ======= expamples dataOBj ======= //
+// ======= expamples dataObj ======= //
 
 // const user = {
 //   firstName: 'Niyozbek',
@@ -147,3 +81,34 @@ app.listen(port, '127.0.0.1');
 //     status: 'nma gap',
 //   });
 // }
+
+// app.get('/api/v1/books', (req, res) => {});
+
+// app.get('/api/v1/books/:id', (req, res) => {});
+
+// app.post('/api/v1/users', (req, res) => {
+//   const idBook = +req.params.id;
+//   const data = req.body;
+//   const id = users.at(-1).id + 1;
+//   const comObj = Object.assign({ id: id }, data);
+//   users.push(comObj);
+//   fs.writeFileSync(
+//     `${__dirname}/dev-data/data/users.json`,
+//     JSON.stringify(users),
+//     'utf-8'
+//   );
+//   res.status(201).json({
+//     status: 'success',
+//   });
+// });
+
+// app.get('/api/v1/users', (req, res) => {
+//   fs.readFile(`${__dirname}/dev-data/data/users.json`, 'utf-8', (er, data) => {
+//     let datas = JSON.parse(data);
+//     res.status(200).json({
+//       data: {
+//         datas,
+//       },
+//     });
+//   });
+// });
