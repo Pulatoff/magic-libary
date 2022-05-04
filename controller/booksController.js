@@ -1,40 +1,79 @@
 const bookModel = require('../model/booksModel');
 
 async function getAllBooks(req, res) {
-  fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (er, data) => {
+  try {
+    const data = await bookModel.find();
     res.status(200).json({
       status: 'success',
-      data: {
-        data,
-      },
+      data: data,
     });
-  });
+  } catch (e) {
+    res.status(404).json({
+      status: 'failed',
+      data: 'invalid request',
+    });
+  }
 }
 
 async function addBook(req, res) {
-  const data = await bookModel.create(req.body);
-  res.status(201).json({
-    status: data,
-  });
+  try {
+    const data = await bookModel.create(req.body);
+    res.status(201).json({
+      status: data,
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'failed',
+      data: 'invalid request',
+    });
+  }
 }
 
 async function getOneBook(req, res) {
-  const id = +req.params.id;
-
-  fs.readFile(`${__dirname}/dev-data/data/books.json`, 'utf-8', (err, data) => {
-    const arr = JSON.parse(data);
-    const obj = arr.find((val) => val.id == id);
+  try {
+    const data = await bookModel.findById(req.params.id);
     res.status(200).json({
       status: 'success',
-      data: {
-        obj,
-      },
+      data: data,
     });
-  });
+  } catch (e) {
+    res.status(404).json({
+      status: 'failed',
+      data: 'invalid request',
+    });
+  }
 }
 
-async function updateBook(req, res) {}
+async function updateBook(req, res) {
+  try {
+    const data = await bookModel.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: data,
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'failed',
+      data: 'invalid request',
+    });
+  }
+}
 
-async function deleteBook(req, res) {}
+async function deleteBook(req, res) {
+  try {
+    const data = await bookModel.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      status: 'success',
+    });
+  } catch (e) {
+    res.status(404).json({
+      status: 'failed',
+      data: 'invalid request',
+    });
+  }
+}
 
 module.exports = { getAllBooks, addBook, getOneBook, updateBook, deleteBook };
